@@ -1,17 +1,16 @@
 ﻿using BlogAPI.Models;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
+using BlogAPI.Models.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using MySqlConnector;
 
 namespace BlogAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("bloggers")]
     [ApiController]
     public class BloggerController : ControllerBase
     {
         string ConnectionString = "Server=localhost;database=blog;User Id=root;password=;";
-        [HttpGet]
+        [HttpGet("All")]
         public object GetAllBloggers()
         {
             List<Blogger> bloggers = new List<Blogger>();
@@ -37,6 +36,48 @@ namespace BlogAPI.Controllers
             connector.Close();
 
             return bloggers;
+        }
+
+        [HttpGet("ById")]
+        public object GetBloggerById(int id)
+        {
+            var connector = new MySqlConnection(ConnectionString);
+            connector.Open();
+
+            MySqlCommand command = new MySqlCommand("SELECT * FROM blogger WHERE Id = @id", connector);
+            command.Parameters.AddWithValue("@id", id);
+            MySqlDataReader reader = command.ExecuteReader();
+
+            reader.Read();
+            
+                var blogger = new Blogger
+                {
+                    Id = reader.GetInt32(0),
+                    Name = reader.GetString(1),
+                    Email = reader.GetString(2),
+                    Age = reader.GetInt32(3),
+                    Password = reader.GetString(4),
+                    RegistrationDate = reader.GetDateTime(5)
+                };
+                connector.Close();
+                return blogger;
+        }
+        [HttpPost("Add")]
+        public object AddBlogger(AddNewBloggerDTO addNewBlogger)
+        {
+
+            var connector = new MySqlConnection(ConnectionString);
+            connector.Open();
+            MySqlCommand command = new MySqlCommand("INSERT INTO blogger (Name, Email, Age, Password, RegistrationTime) VALUES (@name, @email, @age, @password, @registrationTime)", connector);
+
+            command.Parameters.AddWithValue("@name", addNewBlogger.Name);
+            command.Parameters.AddWithValue("@email", addNewBlogger.Email);
+            command.Parameters.AddWithValue("@age", addNewBlogger.Age);
+            command.Parameters.AddWithValue("@password", addNewBlogger.Password);
+            command.Parameters.AddWithValue("@registrationTime", DateTime.Now);
+            command.ExecuteNonQuery();
+            connector.Close();
+            return new {message = "Sikeres Hozzáadás", addNewBlogger = addNewBlogger};
         }
     }
 }
