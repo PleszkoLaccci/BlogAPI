@@ -2,6 +2,7 @@
 using BlogAPI.Models.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using MySqlConnector;
+using System.Security.Cryptography;
 
 namespace BlogAPI.Controllers
 {
@@ -111,15 +112,15 @@ namespace BlogAPI.Controllers
             }
         }
 
-        [HttpDelete("Delete")]
+        [HttpDelete("DeleteById")]
         public object DeleteBlogger(int id)
         {
             var connector = new MySqlConnection(ConnectionString);
             connector.Open();
             MySqlCommand command = new MySqlCommand("DELETE FROM `blogger` WHERE Id = @id", connector);
             command.Parameters.AddWithValue("@id", id);
-            
-            if(command.ExecuteNonQuery() > 0)
+
+            if (command.ExecuteNonQuery() > 0)
             {
                 connector.Close();
                 return new { message = "Sikeres Törlés" };
@@ -129,7 +130,69 @@ namespace BlogAPI.Controllers
                 connector.Close();
                 return new { message = "Nincs ilyen felhasználó" };
             }
+        }
 
+        [HttpPut("UpdateById")]
+        public object UpdateById([FromQuery] int id, [FromBody] UpdateBloggerDTO blogger)
+        {
+            var connector = new MySqlConnection(ConnectionString);
+            connector.Open();
+            MySqlCommand command = new MySqlCommand("UPDATE `blogger` SET Name = @name, Email = @email, Age = @age, Password = @password WHERE Id = @id", connector);
+
+            command.Parameters.AddWithValue("@id", id);
+            command.Parameters.AddWithValue("@name", blogger.Name);
+            command.Parameters.AddWithValue("@email", blogger.Email);
+            command.Parameters.AddWithValue("@age", blogger.Age);
+            command.Parameters.AddWithValue("@password", blogger.Password);
+
+            if (command.ExecuteNonQuery() > 0)
+            {
+                connector.Close();
+                return new { message = "Sikeres Frissítés" };
+            }
+            else
+            {
+                connector.Close();
+                return new { message = "Nincs ilyen felhasználó" };
+            }
+        }
+
+        [HttpGet("NumberOfPeople")]
+        public object NumberOfPeople()
+        {
+            var connector = new MySqlConnection(ConnectionString);
+            connector.Open();
+            MySqlCommand command = new MySqlCommand("SELECT COUNT(*) FROM blogger", connector);
+            int count = Convert.ToInt32(command.ExecuteScalar());
+            connector.Close();
+            return new
+            {
+                numberOfPeople = count
+            };
+        }
+
+        [HttpGet("PeopleA-Z")]
+        public object PeopleA_Z()
+        {
+            var connector = new MySqlConnection(ConnectionString);
+            connector.Open();
+
+            MySqlCommand command = new MySqlCommand("SELECT * FROM blogger ORDER BY Name ASC", connector);
+            MySqlDataReader reader = command.ExecuteReader();
+            List<Blogger> bloggers = new List<Blogger>();
+            while (reader.Read())
+            {
+                Blogger blogger = new Blogger();
+                blogger.Id = reader.GetInt32("Id");
+                blogger.Name = reader.GetString("Name");
+                blogger.Email = reader.GetString("Email");
+                blogger.Age = reader.GetInt32("Age");
+                blogger.Password = reader.GetString("Password");
+                blogger.RegistrationDate = reader.GetDateTime("RegistrationTime");
+                bloggers.Add(blogger);
+            }
+            connector.Close();
+            return bloggers;
         }
     }
 }

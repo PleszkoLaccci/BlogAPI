@@ -44,7 +44,7 @@
   {
     "ContainingType": "BlogAPI.Controllers.BloggerController",
     "Method": "DeleteBlogger",
-    "RelativePath": "bloggers/Delete",
+    "RelativePath": "bloggers/DeleteById",
     "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
@@ -68,6 +68,47 @@
       {
         "Name": "login",
         "Type": "BlogAPI.Models.DTOs.LoginBloggerDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BlogAPI.Controllers.BloggerController",
+    "Method": "NumberOfPeople",
+    "RelativePath": "bloggers/NumberOfPeople",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BlogAPI.Controllers.BloggerController",
+    "Method": "PeopleA_Z",
+    "RelativePath": "bloggers/PeopleA-Z",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BlogAPI.Controllers.BloggerController",
+    "Method": "UpdateById",
+    "RelativePath": "bloggers/UpdateById",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "blogger",
+        "Type": "BlogAPI.Models.DTOs.UpdateBloggerDTO",
         "IsRequired": true
       }
     ],
