@@ -49,18 +49,18 @@ namespace BlogAPI.Controllers
             MySqlDataReader reader = command.ExecuteReader();
 
             reader.Read();
-            
-                var blogger = new Blogger
-                {
-                    Id = reader.GetInt32(0),
-                    Name = reader.GetString(1),
-                    Email = reader.GetString(2),
-                    Age = reader.GetInt32(3),
-                    Password = reader.GetString(4),
-                    RegistrationDate = reader.GetDateTime(5)
-                };
-                connector.Close();
-                return blogger;
+
+            var blogger = new Blogger
+            {
+                Id = reader.GetInt32(0),
+                Name = reader.GetString(1),
+                Email = reader.GetString(2),
+                Age = reader.GetInt32(3),
+                Password = reader.GetString(4),
+                RegistrationDate = reader.GetDateTime(5)
+            };
+            connector.Close();
+            return blogger;
         }
         [HttpPost("Add")]
         public object AddBlogger(AddNewBloggerDTO addNewBlogger)
@@ -77,7 +77,60 @@ namespace BlogAPI.Controllers
             command.Parameters.AddWithValue("@registrationTime", DateTime.Now);
             command.ExecuteNonQuery();
             connector.Close();
-            return new {message = "Sikeres Hozzáadás", addNewBlogger = addNewBlogger};
+            return new { message = "Sikeres Hozzáadás", addNewBlogger = addNewBlogger };
+        }
+
+        [HttpPost("Login")]
+        public object Login(LoginBloggerDTO login)
+        {
+            var connector = new MySqlConnection(ConnectionString);
+            connector.Open();
+            MySqlCommand command = new MySqlCommand("SELECT * FROM blogger WHERE Email = @email AND Password = @password", connector);
+            command.Parameters.AddWithValue("@email", login.Email);
+            command.Parameters.AddWithValue("@password", login.Password);
+            MySqlDataReader reader = command.ExecuteReader();
+
+            if (reader.Read())
+            {
+                var blogger = new Blogger
+                {
+                    Id = reader.GetInt32(0),
+                    Name = reader.GetString(1),
+                    Email = reader.GetString(2),
+                    Age = reader.GetInt32(3),
+                    Password = reader.GetString(4),
+                    RegistrationDate = reader.GetDateTime(5)
+                };
+                connector.Close();
+                return new { message = "Sikeres Bejelentkezés", blogger = blogger };
+            }
+            else
+            {
+                connector.Close();
+                return new { message = "Hibás Email vagy Jelszó" };
+            }
+        }
+
+        [HttpDelete("Delete")]
+        public object DeleteBlogger(int id)
+        {
+            var connector = new MySqlConnection(ConnectionString);
+            connector.Open();
+            MySqlCommand command = new MySqlCommand("DELETE FROM `blogger` WHERE Id = @id", connector);
+            command.Parameters.AddWithValue("@id", id);
+            
+            if(command.ExecuteNonQuery() > 0)
+            {
+                connector.Close();
+                return new { message = "Sikeres Törlés" };
+            }
+            else
+            {
+                connector.Close();
+                return new { message = "Nincs ilyen felhasználó" };
+            }
+
         }
     }
 }
+            
