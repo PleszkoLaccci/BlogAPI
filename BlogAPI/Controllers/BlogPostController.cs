@@ -27,12 +27,12 @@ namespace BlogAPI.Controllers
             while (reader.Read())
             {
                 BlogPost blogPost = new BlogPost();
-                blogPost.Id = reader.GetInt32("Id");
+
                 blogPost.Title = reader.GetString("Title");
                 blogPost.Content = reader.GetString("Content");
                 blogPost.PostTime = reader.GetDateTime("PostTime");
                 blogPost.UpdateTime = reader.GetDateTime("UpdateTime");
-                blogPost.BlogId = reader.GetInt32("BlogId");
+
                 blogPosts.Add(blogPost);
             }
 
@@ -172,12 +172,12 @@ namespace BlogAPI.Controllers
             while (reader.Read())
             {
                 BlogPost blogPost = new BlogPost();
-                blogPost.Id = reader.GetInt32("Id");
+            
                 blogPost.Title = reader.GetString("Title");
                 blogPost.Content = reader.GetString("Content");
                 blogPost.PostTime = reader.GetDateTime("PostTime");
                 blogPost.UpdateTime = reader.GetDateTime("UpdateTime");
-                blogPost.BlogId = reader.GetInt32("BlogId");
+      
                 blogPosts.Add(blogPost);
             }
             connector.Close();
