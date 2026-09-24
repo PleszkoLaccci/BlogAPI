@@ -102,7 +102,87 @@ namespace BlogAPI.Controllers
             {
                 connector.Close();
                 return new { message = "Nincs ilyen Post" };
-            }   
+            }
+        }
+
+        [HttpGet("GetBloggerNameAndEmail")]
+        public object GetBloggerNameAndEmail(int id)
+        {
+            var connector = new MySqlConnection(ConnectionString);
+            connector.Open();
+            MySqlCommand command = new MySqlCommand("SELECT blogger.Name, blogger.Email FROM blogger INNER JOIN blogpost ON blogger.Id = blogpost.BlogId WHERE blogpost.Id = @id", connector);
+            command.Parameters.AddWithValue("@id", id);
+            MySqlDataReader reader = command.ExecuteReader();
+            if (reader.Read())
+            {
+                var name = reader.GetString("Name");
+                var email = reader.GetString("Email");
+                connector.Close();
+                return new { Name = name, Email = email };
+            }
+            else
+            {
+                connector.Close();
+                return new { message = "Nincs ilyen Post" };
+            }
+        }
+
+        [HttpGet("GetBloggerPosts")]
+        public object GetBloggerPosts(int id)
+        {
+            List<BlogPost> blogPosts = new List<BlogPost>();
+            var connector = new MySqlConnection(ConnectionString);
+            connector.Open();
+            MySqlCommand command = new MySqlCommand("SELECT * FROM blogpost WHERE BlogId = @id", connector);
+            command.Parameters.AddWithValue("@id", id);
+            MySqlDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                BlogPost blogPost = new BlogPost();
+                blogPost.Title = reader.GetString("Title");
+                blogPost.Content = reader.GetString("Content");
+                blogPosts.Add(blogPost);
+            }
+            connector.Close();
+            return blogPosts;
+        }
+
+        [HttpGet("GetAllPostCount")]
+        public object GetAllPostCount()
+        {
+            var connector = new MySqlConnection(ConnectionString);
+            connector.Open();
+            MySqlCommand command = new MySqlCommand("SELECT COUNT(*) FROM blogpost", connector);
+            int count = Convert.ToInt32(command.ExecuteScalar());
+            connector.Close();
+            return new
+            {
+                numberOfPosts = count
+            };
+        }
+        [HttpGet("GetAllPostByBlogger")]
+        public object GetAllPostByBlogger(int id)
+        {
+            var connector = new MySqlConnection(ConnectionString);
+            connector.Open();
+            MySqlCommand command = new MySqlCommand("SELECT * FROM blogpost WHERE BlogId = @id", connector);
+            command.Parameters.AddWithValue("@id", id);
+            MySqlDataReader reader = command.ExecuteReader();
+            List<BlogPost> blogPosts = new List<BlogPost>();
+            while (reader.Read())
+            {
+                BlogPost blogPost = new BlogPost();
+                blogPost.Id = reader.GetInt32("Id");
+                blogPost.Title = reader.GetString("Title");
+                blogPost.Content = reader.GetString("Content");
+                blogPost.PostTime = reader.GetDateTime("PostTime");
+                blogPost.UpdateTime = reader.GetDateTime("UpdateTime");
+                blogPost.BlogId = reader.GetInt32("BlogId");
+                blogPosts.Add(blogPost);
+            }
+            connector.Close();
+            var count = blogPosts.Count();
+            return new { message = $"Ennek a bloggernek ennyi posztja van: {count}"  };
         }
     }
 }
