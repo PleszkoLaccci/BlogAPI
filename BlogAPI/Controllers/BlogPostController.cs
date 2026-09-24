@@ -76,7 +76,7 @@ namespace BlogAPI.Controllers
             else
             {
                 connector.Close();
-                return new { message = "Nincs ilyen felhasználó" };
+                return new { message = "Nincs ilyen Post " };
             }
         }
 
@@ -90,7 +90,7 @@ namespace BlogAPI.Controllers
             command.Parameters.AddWithValue("@id", id);
             command.Parameters.AddWithValue("@Title", blogPost.Title);
             command.Parameters.AddWithValue("@Content", blogPost.Content);
-            command.Parameters.AddWithValue("@UpdateTime", blogPost.UpdateTime);
+            command.Parameters.AddWithValue("@UpdateTime", DateTime.Now);
             command.Parameters.AddWithValue("@BlogId", blogPost.BlogId);
 
             if (command.ExecuteNonQuery() > 0)
@@ -101,7 +101,7 @@ namespace BlogAPI.Controllers
             else
             {
                 connector.Close();
-                return new { message = "Nincs ilyen felhasználó" };
+                return new { message = "Nincs ilyen Post" };
             }   
         }
     }
