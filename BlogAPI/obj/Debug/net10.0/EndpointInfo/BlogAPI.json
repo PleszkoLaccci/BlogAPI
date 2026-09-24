@@ -536,10 +536,6 @@
               "string"
             ]
           },
-          "updateTime": {
-            "type": "string",
-            "format": "date-time"
-          },
           "blogId": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
             "type": [

@@ -49,7 +49,11 @@ namespace BlogAPI.Controllers
             command.Parameters.AddWithValue("@id", id);
             MySqlDataReader reader = command.ExecuteReader();
 
-            reader.Read();
+            if (!reader.Read())
+            {
+                connector.Close();
+                return new { message = "Nincs ilyen felhasználó" };
+            }
 
             var blogger = new Blogger
             {
